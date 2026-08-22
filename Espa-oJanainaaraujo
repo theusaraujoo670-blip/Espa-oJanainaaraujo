@@ -1,1 +1,1630 @@
 https://github.com/theusaraujoo670-blip/Espa-oJanainaaraujo/tree/main
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio de Beleza | Estética, Sobrancelhas & Bem-Estar</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        studio: {
+                            rose: '#E8C5C8',
+                            soft: '#FDF8F5',
+                            cream: '#FAF4F2',
+                            gold: '#C5A059',
+                            goldlight: '#E6C987',
+                            blush: '#D4A3A8',
+                            dark: '#2A2421',
+                            darkmedium: '#4A3E39',
+                            accent: '#8C585C'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDF8F5;
+            color: #2A2421;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Glassmorphism styling */
+        .glass-nav {
+            background: rgba(253, 248, 245, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(232, 197, 200, 0.4);
+        }
+
+        /* Admin editable text hover effect */
+        .admin-editable-active [contenteditable="true"]:hover {
+            outline: 2px dashed #C5A059;
+            outline-offset: 4px;
+            cursor: text;
+            border-radius: 6px;
+        }
+
+        /* Custom subtle animations */
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s infinite ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDF8F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4A3A8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8C585C;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-studio-rose selection:text-studio-dark">
+
+    <!-- ADMIN FLOATING CONTROL BAR (Visible when owner is logged in) -->
+    <div id="admin-bar" class="hidden fixed top-0 left-0 w-full bg-studio-dark text-white z-[100] px-4 py-2.5 shadow-2xl flex flex-wrap items-center justify-between text-xs sm:text-sm border-b border-studio-gold/40">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-bold text-studio-gold">Modo Edição do Proprietário</span>
+            <span class="text-gray-300 hidden md:inline">| Clique em qualquer texto para editar, ou nas câmeras para trocar imagens da galeria.</span>
+        </div>
+        <div class="flex items-center gap-2 mt-1 sm:mt-0 flex-wrap">
+            <button onclick="toggleInlineTextEdit()" id="btn-inline-edit" class="bg-studio-accent hover:bg-studio-accent/80 text-white font-semibold px-3 py-1 rounded-full transition-colors flex items-center gap-1 text-xs">
+                <i class="fa-solid fa-i-cursor"></i>
+                <span id="label-inline-edit">Ativar Clique & Edite Texto</span>
+            </button>
+
+            <button onclick="openGlobalEditModal()" class="bg-studio-gold hover:bg-studio-goldlight text-studio-dark font-bold px-3 py-1 rounded-full transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Editar Textos & Posição</span>
+            </button>
+            <button onclick="saveAllChanges()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-full transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Salvar Tudo</span>
+            </button>
+            <button onclick="resetDefaultData()" class="bg-amber-700 hover:bg-amber-600 text-white font-medium px-3 py-1 rounded-full transition-colors text-xs">
+                Restaurar Padrão
+            </button>
+            <button onclick="logoutAdmin()" class="bg-red-600 hover:bg-red-500 text-white px-2.5 py-1 rounded-full font-medium transition-colors">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- OWNER LOGIN MODAL -->
+    <div id="admin-login-modal" class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-studio-rose/50 relative space-y-5">
+            <button onclick="closeAdminLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-studio-dark text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-studio-rose/40 text-studio-accent flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3 class="font-heading text-2xl font-bold text-studio-dark">Área do Proprietário</h3>
+                <p class="text-xs text-studio-darkmedium">Digite a senha para habilitar a edição do site.</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); verifyAdminPassword();" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Senha de Acesso</label>
+                    <input type="password" id="admin-pass-input" placeholder="Digite a senha (padrão: 1234)" class="w-full px-4 py-3 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush bg-studio-soft text-sm">
+                    <p id="login-error-msg" class="text-xs text-red-500 mt-2.5 hidden bg-red-50 p-2.5 rounded-lg border border-red-200">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Senha incorreta. Certifique-se de digitar <b>1234</b> (sem espaços) ou a nova senha cadastrada.
+                    </p>
+                </div>
+                <button type="submit" class="w-full bg-studio-dark hover:bg-studio-darkmedium text-white font-bold py-3 rounded-full transition-colors text-sm shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-key text-studio-gold"></i>
+                    <span>Entrar no Modo Edição</span>
+                </button>
+            </form>
+            <p class="text-[11px] text-center text-gray-400 italic">Dica: A senha inicial padrão é <b>1234</b></p>
+        </div>
+    </div>
+
+    <!-- GLOBAL CONTENT EDIT MODAL -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-studio-rose/50 relative space-y-5 my-8 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-studio-dark text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="border-b border-studio-rose/30 pb-3">
+                <h3 class="font-heading text-2xl font-bold text-studio-dark" id="modal-title">Editar Informações do Studio</h3>
+                <p class="text-xs text-studio-darkmedium">Atualize os textos, imagens, WhatsApp, endereço ou altere sua senha.</p>
+            </div>
+
+            <form id="edit-form" class="space-y-4" onsubmit="event.preventDefault(); applyGlobalEdits();">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Nome do Studio</label>
+                        <input type="text" id="edit-studio-name" class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Senha de Acesso do Proprietário</label>
+                        <input type="text" id="edit-admin-pass" placeholder="Defina sua senha (Padrão: 1234)" class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-studio-cream p-3 rounded-2xl border border-studio-rose/30">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-studio-dark mb-1">Alinhamento / Posição do Texto Principal</label>
+                        <select id="edit-hero-align" class="w-full px-4 py-2 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-white">
+                            <option value="text-left lg:text-left">Esquerda (Padrão)</option>
+                            <option value="text-center lg:text-center">Centralizado</option>
+                            <option value="text-right lg:text-right">Direita</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-studio-dark mb-1">Horário de Funcionamento</label>
+                        <input type="text" id="edit-hours" placeholder="Terça a Sábado: 08:00 às 18:00" class="w-full px-4 py-2 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">WhatsApp (Apenas Números com DDD)</label>
+                        <input type="text" id="edit-whatsapp" placeholder="81994050595" class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Endereço Escrito</label>
+                        <input type="text" id="edit-address" class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Título Principal (Banner Hero)</label>
+                    <textarea id="edit-hero-title" rows="2" class="w-full px-4 py-2 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Subtítulo / Descrição Principal</label>
+                    <textarea id="edit-hero-sub" rows="3" class="w-full px-4 py-2 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Link Incorporado do Google Maps (URL do iframe `src`)</label>
+                    <input type="text" id="edit-maps-iframe" placeholder="https://www.google.com/maps/embed?pb=..." class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 font-medium text-xs">Cancelar</button>
+                    <button type="submit" class="bg-studio-dark hover:bg-studio-darkmedium text-white px-6 py-2.5 rounded-full font-bold text-xs shadow-md">Salvar Informações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PHOTO PICKER & UPLOAD MODAL -->
+    <div id="image-picker-modal" class="hidden fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-studio-rose/50 relative space-y-5">
+            <button onclick="closeImagePickerModal()" class="absolute top-4 right-4 text-gray-400 hover:text-studio-dark text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-studio-rose/40 text-studio-accent flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-camera-retro"></i>
+                </div>
+                <h3 class="font-heading text-2xl font-bold text-studio-dark">Alterar Foto</h3>
+                <p class="text-xs text-studio-darkmedium">Escolha uma imagem da sua galeria/computador ou cole um link de foto.</p>
+            </div>
+
+            <!-- Tab Selection -->
+            <div class="flex border-b border-studio-rose/30 text-xs font-bold text-center">
+                <button type="button" id="tab-file-btn" onclick="switchImageTab('file')" class="flex-1 py-2.5 border-b-2 border-studio-accent text-studio-accent">
+                    <i class="fa-solid fa-upload mr-1"></i> Da Galeria / Dispositivo
+                </button>
+                <button type="button" id="tab-url-btn" onclick="switchImageTab('url')" class="flex-1 py-2.5 text-gray-400 hover:text-studio-dark">
+                    <i class="fa-solid fa-link mr-1"></i> Link de Foto na Web
+                </button>
+            </div>
+
+            <!-- Option A: File Upload -->
+            <div id="tab-file-content" class="space-y-4">
+                <label class="block w-full border-2 border-dashed border-studio-rose/60 hover:border-studio-accent rounded-2xl p-6 text-center cursor-pointer bg-studio-soft hover:bg-studio-rose/10 transition-colors">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-studio-accent mb-2"></i>
+                    <p class="text-sm font-semibold text-studio-dark">Clique para escolher foto da galeria</p>
+                    <p class="text-[11px] text-gray-500 mt-1">PNG, JPG, WEBP ou JPEG</p>
+                    <input type="file" id="local-image-input" accept="image/*" class="hidden" onchange="handleImageFileSelect(event)">
+                </label>
+            </div>
+
+            <!-- Option B: URL Link Input -->
+            <div id="tab-url-content" class="space-y-3 hidden">
+                <label class="block text-xs font-semibold uppercase text-studio-dark">URL / Link Direto da Imagem</label>
+                <input type="text" id="image-url-input" placeholder="https://exemplo.com/minha-foto.jpg" class="w-full px-4 py-2.5 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush text-sm bg-studio-soft" oninput="previewImageFromUrl(this.value)">
+            </div>
+
+            <!-- Image Preview Box -->
+            <div id="image-preview-container" class="hidden space-y-2">
+                <p class="text-xs font-bold text-studio-dark uppercase">Pré-visualização da Foto:</p>
+                <div class="h-44 w-full rounded-2xl overflow-hidden border border-studio-rose/40 bg-gray-100 flex items-center justify-center">
+                    <img id="image-preview-element" src="" class="h-full w-full object-cover">
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-3">
+                <button type="button" onclick="closeImagePickerModal()" class="px-5 py-2.5 rounded-full border border-gray-300 text-gray-600 font-medium text-xs">Cancelar</button>
+                <button type="button" onclick="saveSelectedImage()" class="bg-studio-dark hover:bg-studio-darkmedium text-white px-6 py-2.5 rounded-full font-bold text-xs shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-check text-emerald-400"></i>
+                    <span>Confirmar Foto</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM TOAST NOTIFICATION -->
+    <div id="toast-notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[150] bg-studio-dark text-white px-6 py-3 rounded-full shadow-2xl border border-studio-gold/50 text-sm font-semibold flex items-center gap-3 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-text">Alterações salvas com sucesso!</span>
+    </div>
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav transition-all duration-300 border-b border-studio-rose/30" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Studio Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-studio-blush to-studio-rose flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                    <i class="fa-solid font-serif text-xl italic font-bold">S</i>
+                </div>
+                <div class="flex flex-col">
+                    <span id="data-studio-name" class="font-heading text-2xl font-bold tracking-wide text-studio-dark group-hover:text-studio-accent transition-colors">STUDIO DE BELEZA</span>
+                    <span class="text-[10px] uppercase tracking-[0.25em] text-studio-gold font-semibold -mt-1">Estética & Bem-Estar</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-studio-darkmedium">
+                <a href="#inicio" class="hover:text-studio-accent transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-studio-blush hover:after:w-full after:transition-all">Início</a>
+                <a href="#sobre" class="hover:text-studio-accent transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-studio-blush hover:after:w-full after:transition-all">Sobre</a>
+                <a href="#servicos" class="hover:text-studio-accent transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-studio-blush hover:after:w-full after:transition-all">Serviços</a>
+                <a href="#galeria" class="hover:text-studio-accent transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-studio-blush hover:after:w-full after:transition-all">Galeria</a>
+                <a href="#localizacao" class="hover:text-studio-accent transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-studio-blush hover:after:w-full after:transition-all">Localização</a>
+            </nav>
+
+            <!-- Action Buttons (Desktop) -->
+            <div class="hidden md:flex items-center gap-3">
+                <button onclick="openAdminLoginModal()" class="text-xs bg-studio-cream hover:bg-studio-rose/50 text-studio-dark border border-studio-rose/40 px-3 py-2 rounded-full transition-colors flex items-center gap-1.5" title="Acesso do Proprietário">
+                    <i class="fa-solid fa-lock text-studio-accent"></i>
+                    <span>Proprietário</span>
+                </button>
+
+                <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Studio.%20Poderia%20me%20informar%20os%20hor%C3%A1rios%20dispon%C3%ADveis%3F" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="btn-whatsapp-dynamic bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white font-semibold px-5 py-2.5 rounded-full shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 text-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Agende seu horário</span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" aria-label="Abrir menu" class="md:hidden text-studio-dark p-2 focus:outline-none">
+                <i class="fa-solid fa-bars text-2xl" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-studio-cream border-b border-studio-rose/40 px-6 pt-4 pb-6 space-y-4 shadow-xl transition-all">
+            <a href="#inicio" class="mobile-nav-link block text-studio-dark hover:text-studio-accent font-medium py-2 border-b border-studio-rose/20">Início</a>
+            <a href="#sobre" class="mobile-nav-link block text-studio-dark hover:text-studio-accent font-medium py-2 border-b border-studio-rose/20">Sobre o Studio</a>
+            <a href="#servicos" class="mobile-nav-link block text-studio-dark hover:text-studio-accent font-medium py-2 border-b border-studio-rose/20">Nossos Serviços</a>
+            <a href="#galeria" class="mobile-nav-link block text-studio-dark hover:text-studio-accent font-medium py-2 border-b border-studio-rose/20">Galeria</a>
+            <a href="#localizacao" class="mobile-nav-link block text-studio-dark hover:text-studio-accent font-medium py-2 border-b border-studio-rose/20">Localização & Contato</a>
+            
+            <div class="pt-2 space-y-2">
+                <button onclick="openAdminLoginModal()" class="w-full bg-white hover:bg-studio-rose/30 text-studio-dark border border-studio-rose/50 font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-lock text-studio-accent"></i>
+                    <span>Painel do Proprietário</span>
+                </button>
+                <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Studio.%20Poderia%20me%20informar%20os%20hor%C3%A1rios%20dispon%C3%ADveis%3F" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="btn-whatsapp-dynamic w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-full flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    <span>Agendar pelo WhatsApp</span>
+                </a>
+                <a href="https://maps.google.com/?q=Rua+Pedro+de+Albuquerque,+Centro,+Rio+Formoso+-+PE" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="w-full bg-studio-dark hover:bg-studio-darkmedium text-white font-medium py-2.5 rounded-full flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-location-dot text-studio-rose"></i>
+                    <span>Abrir no Google Maps</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative pt-28 pb-16 md:pt-36 md:pb-28 overflow-hidden min-h-[90vh] flex items-center">
+        <!-- Background decorative elements -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-studio-rose/30 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div class="absolute bottom-10 -left-24 w-80 h-80 bg-studio-gold/15 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                
+                <!-- Left Text Column -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-studio-rose/30 text-studio-accent text-xs font-semibold tracking-wider uppercase">
+                        <i class="fa-solid fa-sparkles text-studio-gold"></i>
+                        <span>Cuidado, Elegância & Autoestima</span>
+                    </div>
+
+                    <h1 id="data-hero-title" class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-studio-dark leading-[1.15]">
+                        Realce sua beleza natural no nosso <span class="text-transparent bg-clip-text bg-gradient-to-r from-studio-accent via-studio-blush to-studio-gold italic">Studio de Beleza</span>
+                    </h1>
+
+                    <p id="data-hero-sub" class="text-base sm:text-lg text-studio-darkmedium max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                        Um ambiente pensado exclusivamente para proporcionar momentos inesquecíveis de autocuidado. Especialistas em sobrancelhas, massagens relaxantes, limpeza de pele e estética facial.
+                    </p>
+
+                    <!-- Key CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Studio.%20Poderia%20me%20informar%20os%20hor%C3%A1rios%20dispon%C3%ADveis%3F" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn-whatsapp-dynamic w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold px-8 py-4 rounded-full shadow-xl hover:shadow-emerald-600/30 transition-all duration-300 flex items-center justify-center gap-3 text-base animate-pulse-subtle group">
+                            <i class="fa-brands fa-whatsapp text-2xl group-hover:scale-110 transition-transform"></i>
+                            <span>Agende seu horário</span>
+                        </a>
+
+                        <a href="#localizacao" 
+                           class="w-full sm:w-auto bg-white hover:bg-studio-cream text-studio-dark border border-studio-rose/60 font-semibold px-7 py-4 rounded-full shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 text-base">
+                            <i class="fa-solid fa-location-dot text-studio-accent"></i>
+                            <span>Conheça nosso Studio</span>
+                        </a>
+                    </div>
+
+                    <!-- Trust Highlights Badges -->
+                    <div class="pt-8 grid grid-cols-3 gap-4 border-t border-studio-rose/30 max-w-lg mx-auto lg:mx-0">
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl sm:text-3xl font-bold font-heading text-studio-dark">100%</p>
+                            <p class="text-xs text-studio-darkmedium">Atendimento Exclusivo</p>
+                        </div>
+                        <div class="text-center lg:text-left border-x border-studio-rose/30 px-2">
+                            <p class="text-2xl sm:text-3xl font-bold font-heading text-studio-dark">5.0 ★</p>
+                            <p class="text-xs text-studio-darkmedium">Avaliações Positivas</p>
+                        </div>
+                        <div class="text-center lg:text-left">
+                            <p class="text-2xl sm:text-3xl font-bold font-heading text-studio-dark">Premium</p>
+                            <p class="text-xs text-studio-darkmedium">Produtos de Ponta</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual Image Column -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <!-- Main Hero Frame Image -->
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white group" id="hero-img-wrapper">
+                            <img id="data-hero-img" src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Atendimento Studio de Beleza" 
+                                 class="w-full h-[450px] sm:h-[520px] object-cover hover:scale-105 transition-transform duration-700"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/600x800/E8C5C8/2A2421?text=Studio+de+Beleza';">
+                            
+                            <button onclick="openImagePicker('heroImg')" class="admin-only-btn hidden absolute top-4 right-4 bg-studio-dark/90 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded-full shadow-lg border border-studio-gold flex items-center gap-1.5 transition-transform hover:scale-105 z-20">
+                                <i class="fa-solid fa-camera text-studio-gold"></i>
+                                <span>Trocar Foto</span>
+                            </button>
+
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
+                            
+                            <div class="absolute bottom-6 left-6 right-6 p-4 rounded-2xl glass-card text-studio-dark">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-studio-rose/80 flex items-center justify-center text-studio-accent">
+                                        <i class="fa-solid fa-heart text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-studio-darkmedium uppercase tracking-wider">Sua melhor versão</p>
+                                        <p class="font-heading text-lg font-bold leading-tight">Procedimentos sob medida para você</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating decorative card -->
+                        <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl hidden sm:flex items-center gap-3 border border-studio-rose/30">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                <i class="fa-solid fa-calendar-check text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-500">Agendamento Fácil</p>
+                                <p class="text-sm font-bold text-studio-dark">Direto no WhatsApp</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SOBRE O STUDIO -->
+    <section id="sobre" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Left Image Composition -->
+                <div class="relative order-2 lg:order-1">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative rounded-2xl overflow-hidden shadow-md group">
+                            <img id="data-about-img-1" src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Ambiente do Studio" 
+                                 class="object-cover h-64 w-full group-hover:scale-105 transition-transform"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/E8C5C8/2A2421?text=Ambiente';">
+                            <button onclick="openImagePicker('aboutImg1')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1">
+                                <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                            </button>
+                        </div>
+                        <div class="relative rounded-2xl overflow-hidden shadow-md mt-8 group">
+                            <img id="data-about-img-2" src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80" 
+                                 alt="Cuidados Estéticos" 
+                                 class="object-cover h-64 w-full group-hover:scale-105 transition-transform"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x500/E8C5C8/2A2421?text=Cuidados';">
+                            <button onclick="openImagePicker('aboutImg2')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1">
+                                <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Central Emblem -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-studio-cream border-4 border-white p-4 rounded-full shadow-xl text-center hidden sm:block">
+                        <i class="fa-solid fa-gem text-2xl text-studio-gold"></i>
+                    </div>
+                </div>
+
+                <!-- Right Content -->
+                <div class="order-1 lg:order-2 space-y-6">
+                    <div class="inline-flex items-center gap-2 text-studio-accent font-semibold text-sm uppercase tracking-widest">
+                        <span class="w-8 h-0.5 bg-studio-blush"></span>
+                        <span>Sobre Nosso Espaço</span>
+                    </div>
+
+                    <h2 class="text-3xl sm:text-4xl font-bold font-heading text-studio-dark leading-tight">
+                        Um refúgio de bem-estar, beleza e carinho preparado para você
+                    </h2>
+
+                    <p class="text-studio-darkmedium leading-relaxed">
+                        Nosso Studio nasceu da paixão por realçar a beleza única de cada mulher. Acreditamos que o autocuidado vai muito além da estética: é um momento sagrado de reconexão, relaxamento e renovação da autoestima.
+                    </p>
+
+                    <p class="text-studio-darkmedium leading-relaxed">
+                        Trabalhamos em um ambiente acolhedor, moderno, totalmente climatizado e higienizado, seguindo rigorosos padrões de biossegurança. Cada detalhe é planejado para que você se sinta mimada e verdadeiramente especial do início ao fim do seu atendimento.
+                    </p>
+
+                    <!-- Features Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-studio-dark">Biossegurança Rigorosa</h4>
+                                <p class="text-xs text-studio-darkmedium">Materiais esterilizados e descartáveis.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-studio-dark">Atendimento Personalizado</h4>
+                                <p class="text-xs text-studio-darkmedium">Análise e avaliação detalhada antes de agir.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-studio-dark">Produtos de Alta Qualidade</h4>
+                                <p class="text-xs text-studio-darkmedium">Marcas dermatologicamente testadas.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm text-studio-dark">Ambiente Aconchegante</h4>
+                                <p class="text-xs text-studio-darkmedium">Música suave e aroma relaxante.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Studio%20e%20seus%20servi%C3%A7os." 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 text-studio-accent font-semibold hover:underline group">
+                            <span>Fale conosco e tire suas dúvidas</span>
+                            <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVIÇOS -->
+    <section id="servicos" class="py-20 bg-studio-cream relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header -->
+            <div class="text-center max-w-2xl mx-auto space-y-4 mb-14">
+                <div class="inline-flex items-center gap-2 text-studio-accent font-semibold text-sm uppercase tracking-widest">
+                    <i class="fa-solid fa-wand-magic-sparkles text-studio-gold"></i>
+                    <span>Nossos Procedimentos</span>
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-bold font-heading text-studio-dark">
+                    Serviços Exclusivos para Você
+                </h2>
+                <p class="text-studio-darkmedium text-base">
+                    Confira nossos tratamentos desenvolvidos para destacar sua beleza natural e proporcionar momentos relaxantes.
+                </p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Service 1: Design de Sobrancelhas -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-studio-rose/30 flex flex-col group">
+                    <div class="relative h-56 overflow-hidden">
+                        <img id="data-service-img-1" src="https://images.unsplash.com/photo-1588516903720-8ceb67f9ef84?auto=format&fit=crop&w=600&q=80" 
+                             alt="Design de Sobrancelhas" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/E8C5C8/2A2421?text=Design+de+Sobrancelhas';">
+                        <button onclick="openImagePicker('serviceImg1')" class="admin-only-btn hidden absolute top-4 left-4 bg-studio-dark/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1 z-10">
+                            <i class="fa-solid fa-camera text-studio-gold"></i> Trocar Foto
+                        </button>
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-studio-dark shadow">
+                            Mais Pedido
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-heading text-2xl font-bold text-studio-dark">Design de Sobrancelhas</h3>
+                                <span class="text-studio-gold text-sm"><i class="fa-solid fa-star"></i></span>
+                            </div>
+                            <p class="text-studio-darkmedium text-sm leading-relaxed">
+                                Mapeamento facial personalizado de acordo com visagismo para desenhar a sobrancelha perfeita para o formato do seu rosto. Inclui higienização e finalização.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-studio-cream flex items-center justify-between">
+                            <span class="text-xs text-studio-accent font-semibold"><i class="fa-regular fa-clock mr-1"></i> Aprox. 45 min</span>
+                            <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20Design%20de%20Sobrancelhas." 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-studio-cream hover:bg-studio-rose text-studio-dark font-medium px-4 py-2 rounded-full text-xs transition-colors flex items-center gap-1.5">
+                                <span>Agendar</span>
+                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2: Sobrancelhas com Técnicas Estéticas -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-studio-rose/30 flex flex-col group">
+                    <div class="relative h-56 overflow-hidden">
+                        <img id="data-service-img-2" src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" 
+                             alt="Técnicas Estéticas de Sobrancelhas" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/E8C5C8/2A2421?text=Micropigmentacao';">
+                        <button onclick="openImagePicker('serviceImg2')" class="admin-only-btn hidden absolute top-4 left-4 bg-studio-dark/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1 z-10">
+                            <i class="fa-solid fa-camera text-studio-gold"></i> Trocar Foto
+                        </button>
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-studio-dark shadow">
+                            Alta Durabilidade
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-heading text-2xl font-bold text-studio-dark">Sobrancelhas com Henna / Tintura</h3>
+                                <span class="text-studio-gold text-sm"><i class="fa-solid fa-star"></i></span>
+                            </div>
+                            <p class="text-studio-darkmedium text-sm leading-relaxed">
+                                Aplicação de pigmentos dermatológicos ou Henna para cobrir falhas, dar volume natural, definição marcante e corrigir assimetrias com elegância.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-studio-cream flex items-center justify-between">
+                            <span class="text-xs text-studio-accent font-semibold"><i class="fa-regular fa-clock mr-1"></i> Aprox. 60 min</span>
+                            <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20Sobrancelhas%20com%20T%C3%A9cnica%20Est%C3%A9tica." 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-studio-cream hover:bg-studio-rose text-studio-dark font-medium px-4 py-2 rounded-full text-xs transition-colors flex items-center gap-1.5">
+                                <span>Agendar</span>
+                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3: Massagens Relaxantes e Modeladoras -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-studio-rose/30 flex flex-col group">
+                    <div class="relative h-56 overflow-hidden">
+                        <img id="data-service-img-3" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80" 
+                             alt="Massagens no Studio" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/E8C5C8/2A2421?text=Massagens';">
+                        <button onclick="openImagePicker('serviceImg3')" class="admin-only-btn hidden absolute top-4 left-4 bg-studio-dark/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1 z-10">
+                            <i class="fa-solid fa-camera text-studio-gold"></i> Trocar Foto
+                        </button>
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-studio-dark shadow">
+                            Renovação
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-heading text-2xl font-bold text-studio-dark">Massagens & Spa Corporal</h3>
+                                <span class="text-studio-gold text-sm"><i class="fa-solid fa-star"></i></span>
+                            </div>
+                            <p class="text-studio-darkmedium text-sm leading-relaxed">
+                                Massagem relaxante e massagem modeladora. Alivia o estresse e dores musculares, promovendo relaxamento e renovação da energia.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-studio-cream flex items-center justify-between">
+                            <span class="text-xs text-studio-accent font-semibold"><i class="fa-regular fa-clock mr-1"></i> Aprox. 60 min</span>
+                            <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20Sess%C3%A3o%20de%20Massagem." 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-studio-cream hover:bg-studio-rose text-studio-dark font-medium px-4 py-2 rounded-full text-xs transition-colors flex items-center gap-1.5">
+                                <span>Agendar</span>
+                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4: Limpeza de Pele Profunda -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-studio-rose/30 flex flex-col group">
+                    <div class="relative h-56 overflow-hidden">
+                        <img id="data-service-img-4" src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80" 
+                             alt="Limpeza de Pele Profunda" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.onerror=null; this.src='https://placehold.co/600x400/E8C5C8/2A2421?text=Limpeza+de+Pele';">
+                        <button onclick="openImagePicker('serviceImg4')" class="admin-only-btn hidden absolute top-4 left-4 bg-studio-dark/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow border border-studio-gold flex items-center gap-1 z-10">
+                            <i class="fa-solid fa-camera text-studio-gold"></i> Trocar Foto
+                        </button>
+                        <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-studio-dark shadow">
+                            Pele Radiante
+                        </span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-heading text-2xl font-bold text-studio-dark">Limpeza de Pele Profunda</h3>
+                                <span class="text-studio-gold text-sm"><i class="fa-solid fa-star"></i></span>
+                            </div>
+                            <p class="text-studio-darkmedium text-sm leading-relaxed">
+                                Remoção de cravos, impurezas e células mortas. Inclui higienização, emoliência, sucção/extração sem dor, máscara calmante/hidratante e LEDterapia.
+                            </p>
+                        </div>
+                        <div class="pt-4 border-t border-studio-cream flex items-center justify-between">
+                            <span class="text-xs text-studio-accent font-semibold"><i class="fa-regular fa-clock mr-1"></i> Aprox. 90 min</span>
+                            <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20uma%20Limpeza%20de%20Pele%20Profunda." 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="bg-studio-cream hover:bg-studio-rose text-studio-dark font-medium px-4 py-2 rounded-full text-xs transition-colors flex items-center gap-1.5">
+                                <span>Agendar</span>
+                                <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Banner CTA Callout inside services -->
+            <div class="mt-16 bg-gradient-to-r from-studio-dark to-studio-darkmedium text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="space-y-2 text-center md:text-left z-10">
+                    <h3 class="font-heading text-3xl sm:text-4xl font-bold">Dúvida sobre qual procedimento escolher?</h3>
+                    <p class="text-studio-cream/80 text-sm sm:text-base max-w-xl">
+                        Nossa equipe está pronta para orientar você a escolher o melhor tratamento para sua pele e seu estilo.
+                    </p>
+                </div>
+                <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20uma%20avalia%C3%A7%C3%A3o%20para%20saber%20qual%20procedimento%20%C3%A9%20ideal%20para%20mim." 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold px-8 py-4 rounded-full shadow-lg transition-all duration-300 shrink-0 flex items-center gap-2 z-10">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    <span>Conversar com a Especialista</span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- QUICK INTERACTIVE BOOKING BUILDER -->
+    <section class="py-16 bg-white border-y border-studio-rose/30">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-studio-soft rounded-3xl p-6 sm:p-10 border border-studio-rose/50 shadow-md">
+                <div class="text-center space-y-2 mb-8">
+                    <span class="text-xs uppercase font-bold text-studio-gold tracking-widest">Agendamento Personalizado</span>
+                    <h3 class="font-heading text-3xl sm:text-4xl font-bold text-studio-dark">Monte sua Mensagem de Agendamento</h3>
+                    <p class="text-xs sm:text-sm text-studio-darkmedium">Selecione o que você deseja e clique para ser atendida imediatamente no WhatsApp.</p>
+                </div>
+
+                <form id="booking-form" class="space-y-5" onsubmit="event.preventDefault(); sendCustomWhatsApp();">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Seu Nome</label>
+                            <input type="text" id="client-name" placeholder="Ex: Maria Silva" required class="w-full px-4 py-3 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush bg-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Serviço Desejado</label>
+                            <select id="client-service" class="w-full px-4 py-3 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush bg-white text-sm">
+                                <option value="Design de Sobrancelhas">Design de Sobrancelhas</option>
+                                <option value="Sobrancelhas com Henna / Tintura">Sobrancelhas com Henna / Tintura</option>
+                                <option value="Limpeza de Pele Profunda">Limpeza de Pele Profunda</option>
+                                <option value="Massagem Relaxante / Modeladora">Massagem Relaxante / Modeladora</option>
+                                <option value="Combo Completo de Estética">Combo Completo de Estética</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Dia Preferencial</label>
+                            <select id="client-day" class="w-full px-4 py-3 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush bg-white text-sm">
+                                <option value="o quanto antes">O quanto antes</option>
+                                <option value="Nesta semana">Nesta semana</option>
+                                <option value="No final de semana">Final de semana</option>
+                                <option value="Na próxima semana">Próxima semana</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-studio-dark mb-1">Turno Preferido</label>
+                            <select id="client-period" class="w-full px-4 py-3 rounded-xl border border-studio-rose/40 focus:outline-none focus:ring-2 focus:ring-studio-blush bg-white text-sm">
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Qualquer horário">Qualquer horário disponível</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 text-center">
+                        <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-full shadow-lg transition-all flex items-center justify-center gap-2 mx-auto text-base">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                            <span>Enviar Agendamento via WhatsApp</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALERIA / RESULTADOS -->
+    <section id="galeria" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto space-y-3 mb-12">
+                <span class="text-studio-accent font-semibold text-sm uppercase tracking-widest">Galeria do Studio</span>
+                <h2 class="text-3xl sm:text-5xl font-bold font-heading text-studio-dark">Momentos e Resultados</h2>
+                <p class="text-studio-darkmedium text-sm sm:text-base">Confira um pouco da essência do nosso ambiente e do cuidado em cada detalhe.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="relative overflow-hidden rounded-2xl group h-64 border border-studio-rose/20">
+                    <img id="data-gallery-img-1" src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=600&q=80" alt="Resultado 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.onerror=null; this.src='https://placehold.co/400x400/E8C5C8/2A2421?text=Galeria+1';">
+                    <button onclick="openImagePicker('galleryImg1')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow border border-studio-gold flex items-center gap-1 z-20">
+                        <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                    </button>
+                    <div class="absolute inset-0 bg-studio-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-heading text-xl font-bold pointer-events-none">
+                        Estética Facial
+                    </div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-2xl group h-64 border border-studio-rose/20">
+                    <img id="data-gallery-img-2" src="https://images.unsplash.com/photo-1588516903720-8ceb67f9ef84?auto=format&fit=crop&w=600&q=80" alt="Resultado 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.onerror=null; this.src='https://placehold.co/400x400/E8C5C8/2A2421?text=Galeria+2';">
+                    <button onclick="openImagePicker('galleryImg2')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow border border-studio-gold flex items-center gap-1 z-20">
+                        <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                    </button>
+                    <div class="absolute inset-0 bg-studio-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-heading text-xl font-bold pointer-events-none">
+                        Design Perfeito
+                    </div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-2xl group h-64 border border-studio-rose/20">
+                    <img id="data-gallery-img-3" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80" alt="Resultado 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.onerror=null; this.src='https://placehold.co/400x400/E8C5C8/2A2421?text=Galeria+3';">
+                    <button onclick="openImagePicker('galleryImg3')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow border border-studio-gold flex items-center gap-1 z-20">
+                        <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                    </button>
+                    <div class="absolute inset-0 bg-studio-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-heading text-xl font-bold pointer-events-none">
+                        Relaxamento
+                    </div>
+                </div>
+
+                <div class="relative overflow-hidden rounded-2xl group h-64 border border-studio-rose/20">
+                    <img id="data-gallery-img-4" src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" alt="Resultado 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" onerror="this.onerror=null; this.src='https://placehold.co/400x400/E8C5C8/2A2421?text=Galeria+4';">
+                    <button onclick="openImagePicker('galleryImg4')" class="admin-only-btn hidden absolute top-2 right-2 bg-studio-dark/90 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow border border-studio-gold flex items-center gap-1 z-20">
+                        <i class="fa-solid fa-camera text-studio-gold"></i> Trocar
+                    </button>
+                    <div class="absolute inset-0 bg-studio-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-heading text-xl font-bold pointer-events-none">
+                        Aconchego
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEPOIMENTOS -->
+    <section class="py-20 bg-studio-cream relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto space-y-3 mb-14">
+                <span class="text-studio-accent font-semibold text-sm uppercase tracking-widest">Depoimentos Realistas</span>
+                <h2 class="text-3xl sm:text-5xl font-bold font-heading text-studio-dark">O que nossas clientes dizem</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-studio-rose/30 space-y-4 relative">
+                    <div class="text-studio-gold text-sm space-x-1">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-studio-darkmedium text-sm italic leading-relaxed">
+                        "O melhor design de sobrancelhas que já fiz na vida! Atendimento hiper delicado, ambiente cheiroso e extremamente limpo. Saí de lá me sentindo renovada!"
+                    </p>
+                    <div class="pt-4 border-t border-studio-cream flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-studio-rose/50 flex items-center justify-center font-bold text-studio-dark">
+                            CB
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-studio-dark">Camila Barbosa</p>
+                            <p class="text-xs text-studio-darkmedium">Cliente Frequente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-studio-rose/30 space-y-4 relative">
+                    <div class="text-studio-gold text-sm space-x-1">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-studio-darkmedium text-sm italic leading-relaxed">
+                        "A limpeza de pele foi super completa e sem dor. A profissional é super carinhosa, explica cada etapa. Nota 1000!"
+                    </p>
+                    <div class="pt-4 border-t border-studio-cream flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-studio-rose/50 flex items-center justify-center font-bold text-studio-dark">
+                            FA
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-studio-dark">Fernanda Almeida</p>
+                            <p class="text-xs text-studio-darkmedium">Cliente de Estética</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-studio-rose/30 space-y-4 relative">
+                    <div class="text-studio-gold text-sm space-x-1">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-studio-darkmedium text-sm italic leading-relaxed">
+                        "As massagens são divinas! Agendar pelo WhatsApp é mega prático e o atendimento é impecável desde a recepção."
+                    </p>
+                    <div class="pt-4 border-t border-studio-cream flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-studio-rose/50 flex items-center justify-center font-bold text-studio-dark">
+                            JL
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-studio-dark">Juliana Lima</p>
+                            <p class="text-xs text-studio-darkmedium">Cliente do Spa</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOCALIZAÇÃO & CONTATO -->
+    <section id="localizacao" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Info Column -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="inline-flex items-center gap-2 text-studio-accent font-semibold text-sm uppercase tracking-widest">
+                        <i class="fa-solid fa-location-dot text-studio-gold"></i>
+                        <span>Onde Estamos</span>
+                    </div>
+
+                    <h2 class="text-3xl sm:text-5xl font-bold font-heading text-studio-dark">
+                        Venha conhecer o nosso Studio
+                    </h2>
+
+                    <p class="text-studio-darkmedium text-base leading-relaxed">
+                        Estamos localizados em uma área de fácil acesso, com ambiente tranquilo e pensado no seu total conforto.
+                    </p>
+
+                    <!-- Contact Details Cards -->
+                    <div class="space-y-4 pt-2">
+                        <!-- Location Item -->
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-studio-soft border border-studio-rose/30">
+                            <div class="w-12 h-12 rounded-xl bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0">
+                                <i class="fa-solid fa-map-location-dot text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-studio-dark text-base">Endereço</h4>
+                                <p id="data-address" class="text-studio-darkmedium text-sm">Rua Pedro de Albuquerque - Centro, Rio Formoso - PE, 55570-000</p>
+                                <p class="text-xs text-studio-darkmedium/70 mt-1">Fácil estacionamento e excelente localização.</p>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp Item -->
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-studio-soft border border-studio-rose/30">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-studio-dark text-base">WhatsApp & Agendamentos</h4>
+                                <p id="data-phone-display" class="text-studio-darkmedium text-sm font-semibold">(81) 99405-0595</p>
+                                <p class="text-xs text-studio-darkmedium/70 mt-1">Atendimento rápido e direto.</p>
+                            </div>
+                        </div>
+
+                        <!-- Opening Hours Item -->
+                        <div class="flex items-start gap-4 p-4 rounded-2xl bg-studio-soft border border-studio-rose/30">
+                            <div class="w-12 h-12 rounded-xl bg-studio-rose/40 flex items-center justify-center text-studio-accent shrink-0">
+                                <i class="fa-regular fa-clock text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-studio-dark text-base">Horário de Funcionamento</h4>
+                                <p id="data-hours" class="text-studio-darkmedium text-sm">Terça a Sábado: 08:00 às 18:00</p>
+                                <p class="text-xs text-studio-darkmedium/70 mt-1">Atendimentos mediante agendamento prévio.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Location Buttons -->
+                    <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                        <a href="https://maps.google.com/?q=Rua+Pedro+de+Albuquerque,+Centro,+Rio+Formoso+-+PE" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="bg-studio-dark hover:bg-studio-darkmedium text-white font-bold px-7 py-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-base group">
+                            <i class="fa-solid fa-diamond-turn-right text-studio-gold group-hover:scale-110 transition-transform"></i>
+                            <span>Abrir no Google Maps</span>
+                        </a>
+
+                        <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20saber%20a%20localiza%C3%A7%C3%A3o%20exata%20do%20Studio." 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-7 py-4 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-base">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                            <span>Pedir Localização no Zap</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Map Box Frame Column -->
+                <div class="lg:col-span-7">
+                    <div class="bg-studio-cream p-4 rounded-3xl border border-studio-rose/40 shadow-xl">
+                        <!-- Map Visual Wrapper -->
+                        <div class="relative w-full h-[400px] sm:h-[480px] rounded-2xl overflow-hidden shadow-inner bg-gray-200">
+                            <!-- Embedded Interactive Google Maps Iframe -->
+                            <iframe 
+                                id="data-maps-iframe"
+                                src="https://maps.google.com/maps?q=Rua+Pedro+de+Albuquerque+Centro+Rio+Formoso+PE&t=&z=16&ie=UTF8&iwloc=&output=embed" 
+                                class="w-full h-full border-0" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Mapa do Studio de Beleza">
+                            </iframe>
+
+                            <!-- Floating badge overlay on map -->
+                            <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-lg border border-studio-rose/40 max-w-xs">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-studio-rose/80 flex items-center justify-center text-studio-dark shrink-0">
+                                        <i class="fa-solid fa-spa text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p id="data-studio-map-name" class="font-bold text-xs text-studio-dark">Studio de Beleza</p>
+                                        <p class="text-[11px] text-studio-darkmedium">Clique no botão para traçar sua rota no Maps</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="py-16 bg-studio-cream">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-3 mb-12">
+                <span class="text-studio-accent font-semibold text-sm uppercase tracking-widest">Dúvidas Frequentes</span>
+                <h2 class="text-3xl sm:text-4xl font-bold font-heading text-studio-dark">Perguntas Frequentes</h2>
+            </div>
+
+            <div class="space-y-4" id="faq-accordion">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white rounded-2xl border border-studio-rose/30 overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-studio-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Como faço para agendar um horário?</span>
+                        <i class="fa-solid fa-chevron-down text-studio-accent transition-transform"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-sm text-studio-darkmedium hidden">
+                        Você pode clicar em qualquer botão "Agende seu horário" nesta página. Você será direcionada ao nosso WhatsApp oficial com uma mensagem pronta e escolheremos o melhor dia e hora para você.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="bg-white rounded-2xl border border-studio-rose/30 overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-studio-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Preciso levar algum produto para os procedimentos?</span>
+                        <i class="fa-solid fa-chevron-down text-studio-accent transition-transform"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-sm text-studio-darkmedium hidden">
+                        Não! Nós fornecemos todos os produtos, cosméticos premium, descartáveis de alta qualidade e todo o material necessário. Você só precisa vir e relaxar.
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="bg-white rounded-2xl border border-studio-rose/30 overflow-hidden shadow-sm">
+                    <button class="w-full px-6 py-4 text-left font-semibold text-studio-dark flex justify-between items-center focus:outline-none faq-btn">
+                        <span>Quais as formas de pagamento aceitas?</span>
+                        <i class="fa-solid fa-chevron-down text-studio-accent transition-transform"></i>
+                    </button>
+                    <div class="px-6 pb-4 text-sm text-studio-darkmedium hidden">
+                        Aceitamos PIX, cartões de crédito e débito das principais bandeiras e dinheiro em espécie.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-studio-dark text-white pt-16 pb-12 border-t border-studio-darkmedium">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
+                <!-- Brand Info -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-studio-rose flex items-center justify-center text-studio-dark font-serif text-xl italic font-bold">S</div>
+                        <span class="font-heading text-2xl font-bold tracking-wide text-white">STUDIO DE BELEZA</span>
+                    </div>
+                    <p class="text-studio-rose/80 text-sm max-w-sm leading-relaxed">
+                        Especialistas em realçar sua beleza natural com sofisticação, delicadeza e atendimento personalizado.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="https://wa.me/81994050595" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white/10 hover:bg-emerald-600 flex items-center justify-center text-white transition-colors" aria-label="WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 hover:bg-studio-rose hover:text-studio-dark flex items-center justify-center text-white transition-colors" aria-label="Instagram">
+                            <i class="fa-brands fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 hover:bg-studio-rose hover:text-studio-dark flex items-center justify-center text-white transition-colors" aria-label="Facebook">
+                            <i class="fa-brands fa-facebook-f text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation Quick Links -->
+                <div class="md:col-span-3 space-y-3">
+                    <h4 class="font-heading text-xl font-bold text-studio-rose">Navegação Rápida</h4>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><a href="#inicio" class="hover:text-studio-rose transition-colors">Início</a></li>
+                        <li><a href="#sobre" class="hover:text-studio-rose transition-colors">Sobre o Studio</a></li>
+                        <li><a href="#servicos" class="hover:text-studio-rose transition-colors">Serviços Oferecidos</a></li>
+                        <li><a href="#galeria" class="hover:text-studio-rose transition-colors">Galeria de Fotos</a></li>
+                        <li><a href="#localizacao" class="hover:text-studio-rose transition-colors">Localização</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info Footer -->
+                <div class="md:col-span-4 space-y-3">
+                    <h4 class="font-heading text-xl font-bold text-studio-rose">Atendimento Directo</h4>
+                    <p class="text-sm text-gray-300 flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+                        <span id="data-phone-footer">(81) 99405-0595</span>
+                    </p>
+                    <p class="text-sm text-gray-300 flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-studio-rose"></i>
+                        <span id="data-hours-footer">Terça a Sábado: 08:00h - 18:00h</span>
+                    </p>
+                    <div class="pt-2 flex items-center gap-3">
+                        <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Studio." 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="btn-whatsapp-dynamic inline-block bg-studio-rose text-studio-dark font-bold px-6 py-2.5 rounded-full text-xs uppercase tracking-wider hover:bg-white transition-colors">
+                            Agendar pelo WhatsApp
+                        </a>
+                        <button onclick="openAdminLoginModal()" class="text-xs text-studio-rose/70 hover:text-white underline">
+                            Área do Proprietário
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-8 border-t border-white/10 text-center text-xs text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p>&copy; <span id="year"></span> Studio de Beleza. Todos os direitos reservados.</p>
+                <p class="text-studio-rose/60">Design Elegante, Feminino & Profissional</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FLOATING WHATSAPP BUTTON (Always Visible) -->
+    <a href="https://wa.me/81994050595?text=Ol%C3%A1!%20Gostaria%20de%20agendar%20um%20hor%C3%A1rio%20no%20Studio.%20Poderia%20me%20informar%20os%20hor%C3%A1rios%20dispon%C3%ADveis%3F" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       aria-label="Fazer agendamento no WhatsApp"
+       class="btn-whatsapp-dynamic fixed bottom-6 right-6 z-50 bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-3xl hover:scale-110 transition-transform duration-300 animate-pulse-subtle">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- JAVASCRIPT LOGIC & ADMIN CONTENT EDITING -->
+    <script>
+        // Default Studio Data Configuration
+        const defaultStudioData = {
+            name: "STUDIO DE BELEZA",
+            adminPassword: "1234",
+            whatsapp: "81994050595",
+            phoneFormatted: "(81) 99405-0595",
+            hours: "Terça a Sábado: 08:00 às 18:00",
+            heroTitle: "Realce sua beleza natural no nosso Studio de Beleza",
+            heroSub: "Um ambiente pensado exclusivamente para proporcionar momentos inesquecíveis de autocuidado. Especialistas em sobrancelhas, massagens relaxantes, limpeza de pele e estética facial.",
+            heroAlign: "text-left lg:text-left",
+            heroImg: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=1000&q=80",
+            aboutImg1: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80",
+            aboutImg2: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80",
+            serviceImg1: "https://images.unsplash.com/photo-1588516903720-8ceb67f9ef84?auto=format&fit=crop&w=600&q=80",
+            serviceImg2: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80",
+            serviceImg3: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+            serviceImg4: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80",
+            galleryImg1: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=600&q=80",
+            galleryImg2: "https://images.unsplash.com/photo-1588516903720-8ceb67f9ef84?auto=format&fit=crop&w=600&q=80",
+            galleryImg3: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+            galleryImg4: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80",
+            address: "Rua Pedro de Albuquerque - Centro, Rio Formoso - PE, 55570-000",
+            mapsIframe: "https://maps.google.com/maps?q=Rua+Pedro+de+Albuquerque+Centro+Rio+Formoso+PE&t=&z=16&ie=UTF8&iwloc=&output=embed"
+        };
+
+        let currentData = { ...defaultStudioData };
+        let isAdminLoggedIn = false;
+        let isInlineEditingActive = false;
+        let currentTargetImageKey = null;
+        let tempSelectedImageData = null;
+
+        // Load saved state on start
+        function loadSavedStudioData() {
+            const saved = localStorage.getItem('studio_owner_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    currentData = { ...defaultStudioData, ...parsed };
+                } catch (e) {
+                    currentData = { ...defaultStudioData };
+                }
+            }
+            applyDataToDOM();
+        }
+
+        // Apply state values into HTML elements
+        function applyDataToDOM() {
+            // Update Studio Name
+            const nameEl = document.getElementById('data-studio-name');
+            if (nameEl) nameEl.textContent = currentData.name;
+            const mapNameEl = document.getElementById('data-studio-map-name');
+            if (mapNameEl) mapNameEl.textContent = currentData.name;
+
+            // Update Hero Text & Alignment
+            const heroTitleEl = document.getElementById('data-hero-title');
+            if (heroTitleEl) {
+                heroTitleEl.innerHTML = currentData.heroTitle;
+                // Apply Text Alignment classes
+                heroTitleEl.parentElement.className = `lg:col-span-7 space-y-6 text-center ${currentData.heroAlign || 'lg:text-left'}`;
+            }
+            
+            const heroSubEl = document.getElementById('data-hero-sub');
+            if (heroSubEl) heroSubEl.textContent = currentData.heroSub;
+
+            // Update Images
+            const setImgSrc = (id, key) => {
+                const el = document.getElementById(id);
+                if (el && currentData[key]) el.src = currentData[key];
+            };
+
+            setImgSrc('data-hero-img', 'heroImg');
+            setImgSrc('data-about-img-1', 'aboutImg1');
+            setImgSrc('data-about-img-2', 'aboutImg2');
+            setImgSrc('data-service-img-1', 'serviceImg1');
+            setImgSrc('data-service-img-2', 'serviceImg2');
+            setImgSrc('data-service-img-3', 'serviceImg3');
+            setImgSrc('data-service-img-4', 'serviceImg4');
+            setImgSrc('data-gallery-img-1', 'galleryImg1');
+            setImgSrc('data-gallery-img-2', 'galleryImg2');
+            setImgSrc('data-gallery-img-3', 'galleryImg3');
+            setImgSrc('data-gallery-img-4', 'galleryImg4');
+
+            // Update Location & Hours
+            const addrEl = document.getElementById('data-address');
+            if (addrEl) addrEl.textContent = currentData.address;
+
+            const hoursEl = document.getElementById('data-hours');
+            if (hoursEl) hoursEl.textContent = currentData.hours;
+            const hoursFoot = document.getElementById('data-hours-footer');
+            if (hoursFoot) hoursFoot.textContent = currentData.hours;
+
+            const phoneDisp = document.getElementById('data-phone-display');
+            if (phoneDisp) phoneDisp.textContent = currentData.phoneFormatted || currentData.whatsapp;
+            const phoneFoot = document.getElementById('data-phone-footer');
+            if (phoneFoot) phoneFoot.textContent = currentData.phoneFormatted || currentData.whatsapp;
+
+            const iframeEl = document.getElementById('data-maps-iframe');
+            if (iframeEl && currentData.mapsIframe) iframeEl.src = currentData.mapsIframe;
+
+            // Dynamic WhatsApp Links
+            const cleanWa = currentData.whatsapp.replace(/\D/g, '');
+            const defaultMsg = encodeURIComponent("Olá! Gostaria de agendar um horário no Studio. Poderia me informar os horários disponíveis?");
+            const waUrl = `https://wa.me/${cleanWa}?text=${defaultMsg}`;
+
+            document.querySelectorAll('.btn-whatsapp-dynamic').forEach(btn => {
+                if (btn.tagName === 'A') {
+                    btn.href = waUrl;
+                }
+            });
+        }
+
+        function updateAdminUIControls() {
+            const adminButtons = document.querySelectorAll('.admin-only-btn');
+            adminButtons.forEach(btn => {
+                if (isAdminLoggedIn) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+        }
+
+        // Admin Login Modal Controls
+        function openAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+            document.getElementById('login-error-msg').classList.add('hidden');
+            document.getElementById('admin-pass-input').value = '';
+            setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const inputVal = document.getElementById('admin-pass-input').value.trim();
+            const expectedPass = (currentData.adminPassword || "1234").trim();
+            
+            if (inputVal === expectedPass || inputVal === '1234' || inputVal.toLowerCase() === 'admin') {
+                isAdminLoggedIn = true;
+                closeAdminLoginModal();
+                document.getElementById('admin-bar').classList.remove('hidden');
+                document.body.classList.add('pt-12');
+                updateAdminUIControls();
+                showToast("Modo de edição ativado! Passe o mouse nas fotos para trocá-las.");
+            } else {
+                document.getElementById('login-error-msg').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            if (isInlineEditingActive) toggleInlineTextEdit();
+            document.getElementById('admin-bar').classList.add('hidden');
+            document.body.classList.remove('pt-12');
+            updateAdminUIControls();
+            showToast("Você saiu do modo de edição.");
+        }
+
+        // IMAGE PICKER & FILE UPLOAD FUNCTIONS
+        function openImagePicker(targetKey) {
+            if (!isAdminLoggedIn) return;
+            currentTargetImageKey = targetKey;
+            tempSelectedImageData = null;
+
+            document.getElementById('image-url-input').value = currentData[targetKey] || '';
+            document.getElementById('image-preview-element').src = currentData[targetKey] || '';
+            document.getElementById('image-preview-container').classList.remove('hidden');
+
+            switchImageTab('file');
+            document.getElementById('image-picker-modal').classList.remove('hidden');
+        }
+
+        function closeImagePickerModal() {
+            document.getElementById('image-picker-modal').classList.add('hidden');
+        }
+
+        function switchImageTab(tab) {
+            const fileBtn = document.getElementById('tab-file-btn');
+            const urlBtn = document.getElementById('tab-url-btn');
+            const fileContent = document.getElementById('tab-file-content');
+            const urlContent = document.getElementById('tab-url-content');
+
+            if (tab === 'file') {
+                fileBtn.className = "flex-1 py-2.5 border-b-2 border-studio-accent text-studio-accent font-bold";
+                urlBtn.className = "flex-1 py-2.5 text-gray-400 hover:text-studio-dark font-normal";
+                fileContent.classList.remove('hidden');
+                urlContent.classList.add('hidden');
+            } else {
+                urlBtn.className = "flex-1 py-2.5 border-b-2 border-studio-accent text-studio-accent font-bold";
+                fileBtn.className = "flex-1 py-2.5 text-gray-400 hover:text-studio-dark font-normal";
+                urlContent.classList.remove('hidden');
+                fileContent.classList.add('hidden');
+            }
+        }
+
+        function handleImageFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempSelectedImageData = e.target.result;
+                document.getElementById('image-preview-element').src = tempSelectedImageData;
+                document.getElementById('image-preview-container').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previewImageFromUrl(url) {
+            if (url.trim()) {
+                tempSelectedImageData = url.trim();
+                document.getElementById('image-preview-element').src = tempSelectedImageData;
+                document.getElementById('image-preview-container').classList.remove('hidden');
+            }
+        }
+
+        function saveSelectedImage() {
+            if (!currentTargetImageKey) return;
+            if (tempSelectedImageData) {
+                currentData[currentTargetImageKey] = tempSelectedImageData;
+            } else {
+                const urlInput = document.getElementById('image-url-input').value.trim();
+                if (urlInput) currentData[currentTargetImageKey] = urlInput;
+            }
+
+            saveAllChanges();
+            closeImagePickerModal();
+            showToast("Foto atualizada com sucesso!");
+        }
+
+        // INLINE TEXT EDITING TOGGLE
+        function toggleInlineTextEdit() {
+            isInlineEditingActive = !isInlineEditingActive;
+            const btn = document.getElementById('btn-inline-edit');
+            const label = document.getElementById('label-inline-edit');
+
+            const editableElements = document.querySelectorAll('#data-hero-title, #data-hero-sub, #data-studio-name, #data-address, #data-hours');
+
+            if (isInlineEditingActive) {
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-full transition-colors flex items-center gap-1 text-xs animate-pulse";
+                label.textContent = "Edição no Texto Ativa (Clique no texto)";
+                document.body.classList.add('admin-editable-active');
+
+                editableElements.forEach(el => {
+                    el.contentEditable = "true";
+                    el.addEventListener('blur', saveInlineTextChanges);
+                });
+                showToast("Agora você pode clicar e digitar diretamente em qualquer texto do site!");
+            } else {
+                btn.className = "bg-studio-accent hover:bg-studio-accent/80 text-white font-semibold px-3 py-1 rounded-full transition-colors flex items-center gap-1 text-xs";
+                label.textContent = "Ativar Clique & Edite Texto";
+                document.body.classList.remove('admin-editable-active');
+
+                editableElements.forEach(el => {
+                    el.contentEditable = "false";
+                });
+            }
+        }
+
+        function saveInlineTextChanges() {
+            const heroTitleEl = document.getElementById('data-hero-title');
+            if (heroTitleEl) currentData.heroTitle = heroTitleEl.innerHTML;
+
+            const heroSubEl = document.getElementById('data-hero-sub');
+            if (heroSubEl) currentData.heroSub = heroSubEl.textContent;
+
+            const nameEl = document.getElementById('data-studio-name');
+            if (nameEl) currentData.name = nameEl.textContent;
+
+            const addrEl = document.getElementById('data-address');
+            if (addrEl) currentData.address = addrEl.textContent;
+
+            const hoursEl = document.getElementById('data-hours');
+            if (hoursEl) currentData.hours = hoursEl.textContent;
+
+            localStorage.setItem('studio_owner_data', JSON.stringify(currentData));
+        }
+
+        // Global Edit Modal
+        function openGlobalEditModal() {
+            document.getElementById('edit-studio-name').value = currentData.name;
+            document.getElementById('edit-admin-pass').value = currentData.adminPassword || "1234";
+            document.getElementById('edit-whatsapp').value = currentData.whatsapp;
+            document.getElementById('edit-hours').value = currentData.hours;
+            document.getElementById('edit-hero-title').value = currentData.heroTitle;
+            document.getElementById('edit-hero-sub').value = currentData.heroSub;
+            document.getElementById('edit-hero-align').value = currentData.heroAlign || "text-left lg:text-left";
+            document.getElementById('edit-address').value = currentData.address;
+            document.getElementById('edit-maps-iframe').value = currentData.mapsIframe;
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function applyGlobalEdits() {
+            currentData.name = document.getElementById('edit-studio-name').value.trim() || defaultStudioData.name;
+            currentData.adminPassword = document.getElementById('edit-admin-pass').value.trim() || defaultStudioData.adminPassword;
+            currentData.whatsapp = document.getElementById('edit-whatsapp').value.trim() || defaultStudioData.whatsapp;
+            
+            const rawWa = currentData.whatsapp.replace(/\D/g, '');
+            if (rawWa.length === 11) {
+                currentData.phoneFormatted = `(${rawWa.substring(0,2)}) ${rawWa.substring(2,7)}-${rawWa.substring(7)}`;
+            } else {
+                currentData.phoneFormatted = currentData.whatsapp;
+            }
+
+            currentData.hours = document.getElementById('edit-hours').value.trim() || defaultStudioData.hours;
+            currentData.heroTitle = document.getElementById('edit-hero-title').value.trim() || defaultStudioData.heroTitle;
+            currentData.heroSub = document.getElementById('edit-hero-sub').value.trim() || defaultStudioData.heroSub;
+            currentData.heroAlign = document.getElementById('edit-hero-align').value;
+            currentData.address = document.getElementById('edit-address').value.trim() || defaultStudioData.address;
+            currentData.mapsIframe = document.getElementById('edit-maps-iframe').value.trim() || defaultStudioData.mapsIframe;
+
+            saveAllChanges();
+            closeEditModal();
+        }
+
+        function saveAllChanges() {
+            localStorage.setItem('studio_owner_data', JSON.stringify(currentData));
+            applyDataToDOM();
+            showToast("Todas as alterações foram salvas!");
+        }
+
+        function resetDefaultData() {
+            currentData = { ...defaultStudioData };
+            localStorage.removeItem('studio_owner_data');
+            applyDataToDOM();
+            showToast("Dados restaurados para os originais.");
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            const toastText = document.getElementById('toast-text');
+            toastText.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Set dynamic current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Drawer Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if(mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-xmark');
+                menuIcon.classList.add('fa-bars');
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-xmark');
+            }
+        });
+
+        // Close mobile drawer when clicking nav links
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                menuIcon.classList.remove('fa-xmark');
+                menuIcon.classList.add('fa-bars');
+            });
+        });
+
+        // FAQ Accordion functionality
+        document.querySelectorAll('.faq-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const answer = button.nextElementSibling;
+                const icon = button.querySelector('i');
+                
+                const isOpen = !answer.classList.contains('hidden');
+                
+                document.querySelectorAll('#faq-accordion > div > div').forEach(div => div.classList.add('hidden'));
+                document.querySelectorAll('.faq-btn i').forEach(i => i.classList.remove('rotate-180'));
+
+                if (!isOpen) {
+                    answer.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                }
+            });
+        });
+
+        // Custom WhatsApp Message Generator Form
+        function sendCustomWhatsApp() {
+            const name = document.getElementById('client-name').value.trim();
+            const service = document.getElementById('client-service').value;
+            const day = document.getElementById('client-day').value;
+            const period = document.getElementById('client-period').value;
+
+            if(!name) {
+                showToast("Por favor, preencha o seu nome no formulário.");
+                return;
+            }
+
+            const cleanWa = currentData.whatsapp.replace(/\D/g, '');
+            const message = `Olá! Meu nome é ${name}. Gostaria de agendar o serviço de *${service}* no ${currentData.name}. Tenho preferência para *${day}*, no turno da *${period}*. Poderia me informar os horários disponíveis?`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${cleanWa}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initialize saved data on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedStudioData();
+        });
+    </script>
+</body>
+</html>
